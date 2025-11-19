@@ -1,0 +1,59 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #f0f0f0;
+}
+
+.seesaw-area {
+    position: relative;
+    width:600px; /* alanı biraz geniş tuttum */
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+/* tahterevalli'nin çubuğunu yani plank'ı ayarladığımız kısım*/
+.plank {
+    width:400px;
+    height:20px;
+    background-color: #8B4513;
+    border-radius: 5px;
+    position: absolute; /* bu şekilde pivotun konumuna göre hizalanacak */
+    left: 50%; /* tam ortaya hizalamak için */
+    transform: translateX(-50%); /* tam ortaya hizalamak için */
+    bottom: 0px;
+    transform-origin: center center; /* orta noktadan dönmesi için */
+    cursor: pointer; /* fareyle üzerine gelince tıklanabildiği gözükmesi için */
+    transition: transform 0.5s ease-in-out;
+}
+
+
+/* pivot noktası */
+.pivot {
+    width: 50px;
+    height: 150px;
+    background-color: #000000; 
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* Üçgen şekli */
+    position: absolute;
+    bottom: 0;
+    /* Seesaw alanının tam merkezine yerleştirilir */
+    left: 50%; 
+    transform: translateX(-50%);
+}
+
+
+/* kontrol değerlerinin kutusu */
+.controls {
+    position: absolute;
+    top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background-color: rgb(0, 241, 68);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
