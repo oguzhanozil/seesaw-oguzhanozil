@@ -14,41 +14,28 @@ let objects = [];
 let leftWeight = 0;
 let rightWeight = 0;
 let currentObj = null;
+let line = null;
 
 function init(){
-    const weight = Math.floor(Math.random() * 10) + 1;
-    const obj = document.createElement('div');
-    const size = 22 + (weight * 3);
-    obj.className = 'weight-object';
-    obj.style.width = size + 'px';
-    obj.style.height = size + 'px';
-    obj.style.backgroundColor = getRandomColor();
-    obj.style.borderRadius = '50%';
-    obj.style.position = 'fixed';
-    obj.style.display = 'flex';
-    obj.style.alignItems = 'center';
-    obj.style.justifyContent = 'center';
-    obj.style.color = 'white';
-    obj.style.fontWeight = 'bold';
-    obj.style.fontSize = Math.max(10, weight + 2) + 'px';
-    obj.textContent = weight + 'kg';
-    obj.style.cursor = 'pointer';
-    obj.style.pointerEvents = 'none';
-    document.body.appendChild(obj);
-    currentObj = obj;
+    createObject();
+    createLine();
 }
 
 seesawArea.addEventListener('mousemove', function(event) {
     if (!currentObj) return;
     // mouse pozisyonuna göre objeyi yerleştirir
     currentObj.style.left = event.clientX + 'px';
-    currentObj.style.top = '300px';
+    currentObj.style.top = '40%';
     currentObj.style.transform = 'translate(-50%, -50%)';
+    updateLine(event.clientX);
 });
 
 seesawArea.addEventListener('mouseleave', function() {
     if (currentObj) {
         currentObj.style.display = 'none';
+    }
+    if (line) {
+        line.style.display = 'none'; 
     }
 });
 
@@ -80,6 +67,56 @@ seesawArea.addEventListener('click', function(event) {
     currentObj = null;
     init();
 });
+function createObject(){
+    const weight = Math.floor(Math.random() * 10) + 1;
+    const obj = document.createElement('div');
+    const size = 22 + (weight * 3);
+    obj.className = 'weight-object';
+    obj.style.width = size + 'px';
+    obj.style.height = size + 'px';
+    obj.style.backgroundColor = getRandomColor();
+    obj.style.borderRadius = '50%';
+    obj.style.position = 'fixed';
+    obj.style.display = 'flex';
+    obj.style.alignItems = 'center';
+    obj.style.justifyContent = 'center';
+    obj.style.color = 'white';
+    obj.style.fontWeight = 'bold';
+    obj.style.fontSize = Math.max(10, weight + 2) + 'px';
+    obj.textContent = weight + 'kg';
+    obj.style.cursor = 'pointer';
+    obj.style.pointerEvents = 'none';
+    document.body.appendChild(obj);
+    currentObj = obj;
+}
+//obj (top) ile plank arası çizgi oluşturur
+function createLine(){
+    if (line) {
+        document.body.removeChild(line);
+    }
+    line = document.createElement('div');
+    line.style.position = 'fixed';
+    document.body.appendChild(line);
+    line.style.top = '40%';
+    line.style.width = '2px';
+    line.style.height = '50px';
+    line.style.backgroundColor = 'grey';
+    line.style.opacity = '0.7';
+    line.style.pointerEvents = 'none';
+}
+//çizginin konumunu anlık olarak günceller
+function updateLine(positionX){
+    if (!line) return;
+    
+    const objRect = currentObj.getBoundingClientRect();
+    const plankRect = plank.getBoundingClientRect();
+    const height = plankRect.top - objRect.bottom;
+    line.style.left = positionX + 'px';
+    line.style.top = objRect.bottom + 'px';
+    line.style.height = height + 'px';
+    line.style.display = 'block';
+    
+}
 
 function getRandomColor() {
     const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
