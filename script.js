@@ -23,11 +23,16 @@ function init(){
 
 seesawArea.addEventListener('mousemove', function(event) {
     if (!currentObj) return;
-    // mouse pozisyonuna göre objeyi yerleştirir
+    // mouse pozisyonuna göre objeyi yerleştirir plank dışına çıkıldığında
+    // çıkıldığı yöndeki plank sınırına sabitler
+    const rect = plank.getBoundingClientRect();
+    if (rect.left < event.clientX && rect.right > event.clientX) {
     currentObj.style.left = event.clientX + 'px';
     currentObj.style.top = '40%';
     currentObj.style.transform = 'translate(-50%, -50%)';
     updateLine(event.clientX);
+    } 
+    
 });
 
 seesawArea.addEventListener('mouseleave', function() {
@@ -42,6 +47,9 @@ seesawArea.addEventListener('mouseleave', function() {
 seesawArea.addEventListener('mouseenter', function() {
     if (currentObj) {
         currentObj.style.display = 'flex';
+    }
+    if (line) {
+        line.style.display = 'flex'; 
     }
 });
 
@@ -139,7 +147,9 @@ function addObject(positionX, weight, obj,clickX) {
         obj.style.bottom = '0%';
         obj.style.transform = 'translateX(-50%) translateY(-100%)';
         plank.appendChild(obj);
-        
+        const newRect = plank.getBoundingClientRect();
+        const actualLeft = clickX - newRect.left;
+        obj.style.left = actualLeft + 'px';
         //objeyi listeye kaydeder
         objects.push({
             x: positionX,
@@ -153,7 +163,7 @@ function addObject(positionX, weight, obj,clickX) {
 function dropdownAnimation(startY, positionX, obj, targetY, callback){
     let positionY = startY;
     let velocity = 0;
-    const gravity = 0.8;
+    const gravity = 0.3;
 
     function animate(){   
     velocity += gravity;
