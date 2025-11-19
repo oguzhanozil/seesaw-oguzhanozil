@@ -18,7 +18,7 @@ let currentObj = null;
 function init(){
     const weight = Math.floor(Math.random() * 10) + 1;
     const obj = document.createElement('div');
-    const size = 20 + (weight * 3);
+    const size = 22 + (weight * 3);
     obj.className = 'weight-object';
     obj.style.width = size + 'px';
     obj.style.height = size + 'px';
@@ -40,9 +40,9 @@ function init(){
 
 seesawArea.addEventListener('mousemove', function(event) {
     if (!currentObj) return;
-    // mouse pozisyonuna göre objeyi yerleştirmek için
+    // mouse pozisyonuna göre objeyi yerleştirir
     currentObj.style.left = event.clientX + 'px';
-    currentObj.style.top = event.clientY + 'px';
+    currentObj.style.top = '300px';
     currentObj.style.transform = 'translate(-50%, -50%)';
 });
 
@@ -64,7 +64,7 @@ seesawArea.addEventListener('click', function(event) {
     const rect = plank.getBoundingClientRect();
     let clickX = event.clientX;
     
-    // plank dışına tıklamayı engellemek için
+    // plank dışına tıklamayı engeller
     if(clickX < rect.left){
         clickX = rect.left;
     }
@@ -74,10 +74,9 @@ seesawArea.addEventListener('click', function(event) {
     
     const relativeX = clickX - rect.left;
     
-    // mevcut objenin ağırlığını al
+    // mevcut objenin ağırlığını alır
     const weight = parseInt(currentObj.textContent);   
-    addObject(relativeX, weight, currentObj); 
-    calculate(); 
+    addObject(relativeX, weight, currentObj, clickX); 
     currentObj = null;
     init();
 });
@@ -87,23 +86,52 @@ function getRandomColor() {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function addObject(positionX, weight, obj) {
-    // objenin konumunu ayarlamak için  (plank'ın üstünde)
-    obj.style.left = positionX + 'px';
+function addObject(positionX, weight, obj,clickX) {
+    const rect = plank.getBoundingClientRect();
+    const seesawRect = seesawArea.getBoundingClientRect();
+    obj.style.position = 'fixed';
+    obj.style.left = clickX + 'px';
+    obj.style.top = (seesawRect.top - 100) + 'px'; 
     obj.style.transform = 'translateX(-50%)';
-    obj.style.top = '-' + (parseInt(obj.style.height) / 2 + 5) + 'px'; 
-    
-    // planka eklemek için
-    plank.appendChild(obj);
-    
-    //objeyi listeye kaydet
-    objects.push({
-        x: positionX,
-        weight: weight,
-        element: obj
+    const targetY = (rect.top - parseInt(obj.style.height) / 2)+25;
+    dropdownAnimation(parseFloat(obj.style.top), clickX, obj, targetY, () => {
+        // animasyon bitince planka yerleştirir
+        obj.style.position = 'absolute';
+        obj.style.left = positionX + 'px';
+        obj.style.top = '0px';
+        obj.style.bottom = '0%';
+        obj.style.transform = 'translateX(-50%) translateY(-100%)';
+        plank.appendChild(obj);
+        
+        //objeyi listeye kaydeder
+        objects.push({
+            x: positionX,
+            weight: weight,
+            element: obj
+        });
+        
+        calculate();
     });
 }
+function dropdownAnimation(startY, positionX, obj, targetY, callback){
+    let positionY = startY;
+    let velocity = 0;
+    const gravity = 0.8;
 
+    function animate(){   
+    velocity += gravity;
+    positionY += velocity;
+
+    if (positionY >= targetY){
+        obj.style.top = targetY + 'px';
+        callback();
+        return;
+    }
+    obj.style.top = positionY + 'px';
+    window.requestAnimationFrame(animate);
+    }
+    window.requestAnimationFrame(animate);
+}
 function calculate(){
     let leftTorque = 0;
     let rightTorque = 0;
@@ -132,5 +160,5 @@ function calculate(){
     plank.style.transform = `translateX(-50%) rotate(${angle}deg)`;
 }
 
-// sayfa yüklendiğinde ilk objeyi oluştur
+// sayfa yüklendiğinde ilk objeyi oluşturur
 init();
