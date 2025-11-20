@@ -8,6 +8,7 @@ const plank = document.getElementById('seesaw-plank');
 const pivot = document.getElementById('seesaw-pivot');
 const leftWeightDisplay = document.getElementById('left-weight');
 const rightWeightDisplay = document.getElementById('right-weight');
+const resetButton = document.getElementById('reset-btn');
 
 //başlangıç değerleri
 let objects = []; 
@@ -75,6 +76,9 @@ seesawArea.addEventListener('click', function(event) {
     currentObj = null;
     init();
 });
+
+resetButton.addEventListener('click', resetSeesaw);
+
 function createObject(){
     const weight = Math.floor(Math.random() * 10) + 1;
     const obj = document.createElement('div');
@@ -201,11 +205,90 @@ function calculate(){
     
     leftWeightDisplay.textContent = leftWeight;
     rightWeightDisplay.textContent = rightWeight;
-
     const torqueDifference = rightTorque - leftTorque;
     const angle = Math.max(-MAX_ANGLE, Math.min(MAX_ANGLE, torqueDifference / 10));
     plank.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+    saveState();
+}
+
+// kaydetme, yükleme ve reset methodları - küçük bir proje olduğu için yeni script dosyasında oluşturmadım
+function saveState(){
+    const state = {
+         objects: objects.map(obj => ({
+            x: obj.x,
+            weight: obj.weight,
+            color: obj.element.style.backgroundColor,
+            size: obj.element.style.width
+        })),
+        leftWeight: leftWeight,
+        rightWeight: rightWeight
+    };
+    localStorage.setItem('seesawState', JSON.stringify(state));
+}
+
+function loadState(){
+    const savedState = localStorage.getItem('seesawState');
+    if (!savedState) return false;
+    const state = JSON.parse(savedState);
+    state.objects.forEach(objData => {
+        const obj = document.createElement('div');
+        obj.className = 'weight-object';
+        obj.style.width = objData.size;
+        obj.style.height = objData.size;
+        obj.style.backgroundColor = objData.color;
+        obj.style.borderRadius = '50%';
+        obj.style.position = 'absolute';
+        obj.style.left = objData.x + 'px';
+        obj.style.top = '0px';
+        obj.style.display = 'flex';
+        obj.style.alignItems = 'center';
+        obj.style.justifyContent = 'center';
+        obj.style.color = 'white';
+        obj.style.fontWeight = 'bold';
+        obj.style.fontSize = Math.max(10, objData.weight + 2) + 'px';
+        obj.textContent = objData.weight + 'kg';
+        obj.style.transform = 'translateX(-50%) translateY(-100%)';
+        obj.style.pointerEvents = 'none';
+        
+        plank.appendChild(obj);
+        
+        objects.push({
+            x: objData.x,
+            weight: objData.weight,
+            element: obj
+        });
+    });
+    
+    leftWeight = state.leftWeight;
+    rightWeight = state.rightWeight;    
+    calculate();
+    init(); 
+    return true; 
+}
+
+function resetSeesaw(){
+    if (currentObj) {
+        document.body.removeChild(currentObj);
+        currentObj = null;
+    }
+    if (line) {
+        document.body.removeChild(line);
+        line = null;
+    }
+    objects.forEach(obj => {
+        plank.removeChild(obj.element);
+    });
+    objects = [];
+    leftWeight = 0;
+    rightWeight = 0;
+    localStorage.removeItem('seesawState');
+    plank.style.transform = 'translateX(-50%) rotate(0deg)';
+    leftWeightDisplay.textContent = '0';
+    rightWeightDisplay.textContent = '0';
+    init();
 }
 
 // sayfa yüklendiğinde ilk objeyi oluşturur
-init();
+if (!loadState()) {
+    init();
+}

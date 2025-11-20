@@ -57,3 +57,23 @@ body {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
+
+
+.reset-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ff4757;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.reset-button:hover {
+    background-color: #ff3838;
+}
+
+.reset-button:active {
+    transform: scale(0.95);
+}
