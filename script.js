@@ -74,10 +74,13 @@ seesawArea.addEventListener('click', (event) => {
     }
     
     const relativeX = clickX - rect.left;
-    
+    //ne yaparsam yapayım açı değişince istediğim yere obje düşmüyor
+    //eğer düşeceği koordinatı o anki açının kosinüsüne bölersem istediğim
+    //koordinatı elde edebilirim
+    const currentAngle = parseFloat(angleDisplay.textContent);
     // mevcut objenin ağırlığını alır
     const weight = parseInt(currentObj.textContent);   
-    addObject(relativeX, weight, currentObj, clickX); 
+    addObject(relativeX, weight, currentObj, clickX,currentAngle); 
     currentObj = null;
     init();
 });
@@ -141,7 +144,7 @@ function getRandomColor() {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function addObject(positionX, weight, obj,clickX) {
+function addObject(positionX, weight, obj,clickX,angle) {
     const rect = plank.getBoundingClientRect();
     const seesawRect = seesawArea.getBoundingClientRect();
     obj.style.position = 'fixed';
@@ -149,17 +152,17 @@ function addObject(positionX, weight, obj,clickX) {
     obj.style.top = (seesawRect.top - 100) + 'px'; 
     obj.style.transform = 'translateX(-50%)';
     const targetY = (rect.top - parseInt(obj.style.height) / 2)+25;
-    dropdownAnimation(parseFloat(obj.style.top), clickX, obj, targetY, () => {
+    dropdownAnimation(parseFloat(obj.style.top), obj, targetY, () => {
         // animasyon bitince planka yerleştirir
+        plank.appendChild(obj);
         obj.style.position = 'absolute';
         obj.style.left = positionX + 'px';
         obj.style.top = '0px';
         obj.style.bottom = '0%';
         obj.style.transform = 'translateX(-50%) translateY(-100%)';
-        plank.appendChild(obj);
         const newRect = plank.getBoundingClientRect();
         const actualLeft = clickX - newRect.left;
-        obj.style.left = actualLeft + 'px';
+        obj.style.left = actualLeft/ Math.cos(angle * Math.PI / 180) + 'px';
         //objeyi listeye kaydeder
         objects.push({
             x: positionX,
@@ -170,7 +173,7 @@ function addObject(positionX, weight, obj,clickX) {
         calculate();
     });
 }
-function dropdownAnimation(startY, positionX, obj, targetY, callback){
+function dropdownAnimation(startY, obj, targetY, callback){
     let positionY = startY;
     let velocity = 0;
     const gravity = 0.3;
