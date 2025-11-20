@@ -80,9 +80,12 @@ seesawArea.addEventListener('click', (event) => {
     const currentAngle = parseFloat(angleDisplay.textContent);
     // mevcut objenin ağırlığını alır
     const weight = parseInt(currentObj.textContent);   
-    addObject(relativeX, weight, currentObj, clickX,currentAngle); 
+
+    const droppingObj = currentObj;
     currentObj = null;
-    init();
+    createObject();
+    createLine();
+    addObject(relativeX, weight, droppingObj, clickX, currentAngle); 
 });
 
 resetButton.addEventListener('click', resetSeesaw);
@@ -159,7 +162,7 @@ function addObject(positionX, weight, obj,clickX,angle) {
         obj.style.left = positionX + 'px';
         obj.style.top = '0px';
         obj.style.bottom = '0%';
-        obj.style.transform = 'translateX(-50%) translateY(-100%)';
+        obj.style.transform = 'translateX(-50%) translateY(-20%)';
         const newRect = plank.getBoundingClientRect();
         const actualLeft = clickX - newRect.left;
         obj.style.left = actualLeft/ Math.cos(angle * Math.PI / 180) + 'px';
