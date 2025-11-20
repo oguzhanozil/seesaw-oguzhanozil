@@ -83,6 +83,24 @@ body {
     size: 10%;
 }
 
+.row{
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 600px;
+
+}
+
+.distance-indicator {
+    position: flex;
+    min-width: 111px;
+    font-size: 16px;
+    border: 2px solid #5c5a5a; 
+    padding: 8px 12px; 
+    border-radius: 5px; 
+    background-color: white; 
+}
+
 .reset-button {
     padding: 10px 20px;
     background-color: #ff4757;
@@ -91,7 +109,7 @@ body {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin-left: 80%;
+    margin-left: 20%;
 }
 
 .reset-button:hover {

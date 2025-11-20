@@ -11,6 +11,7 @@ const rightWeightDisplay = document.getElementById('right-weight');
 const angleDisplay = document.getElementById('angle');
 const nextWeightDisplay = document.getElementById('next-weight');
 const resetButton = document.getElementById('reset-btn');
+const distanceIndicator = document.getElementById('distance-indicator');
 
 //başlangıç değerleri
 let objects = []; 
@@ -29,13 +30,14 @@ seesawArea.addEventListener('mousemove', (event) => {
     // mouse pozisyonuna göre objeyi yerleştirir plank dışına çıkıldığında
     // çıkıldığı yöndeki plank sınırına sabitler
     const rect = plank.getBoundingClientRect();
+    let center = (rect.right + rect.left)/2;
     if (rect.left < event.clientX && rect.right > event.clientX) {
     currentObj.style.left = event.clientX + 'px';
     currentObj.style.top = '40%';
     currentObj.style.transform = 'translate(-50%, -50%)';
     updateLine(event.clientX);
-    } 
-    
+    distanceIndicator.textContent = Math.round(event.clientX - center);
+    }    
 });
 
 seesawArea.addEventListener('mouseleave', () => {
