@@ -8,6 +8,8 @@ const plank = document.getElementById('seesaw-plank');
 const pivot = document.getElementById('seesaw-pivot');
 const leftWeightDisplay = document.getElementById('left-weight');
 const rightWeightDisplay = document.getElementById('right-weight');
+const angleDisplay = document.getElementById('angle');
+const nextWeightDisplay = document.getElementById('next-weight');
 const resetButton = document.getElementById('reset-btn');
 
 //başlangıç değerleri
@@ -22,7 +24,7 @@ function init(){
     createLine();
 }
 
-seesawArea.addEventListener('mousemove', function(event) {
+seesawArea.addEventListener('mousemove', (event) => {
     if (!currentObj) return;
     // mouse pozisyonuna göre objeyi yerleştirir plank dışına çıkıldığında
     // çıkıldığı yöndeki plank sınırına sabitler
@@ -36,7 +38,7 @@ seesawArea.addEventListener('mousemove', function(event) {
     
 });
 
-seesawArea.addEventListener('mouseleave', function() {
+seesawArea.addEventListener('mouseleave', () => {
     if (currentObj) {
         currentObj.style.display = 'none';
     }
@@ -45,7 +47,7 @@ seesawArea.addEventListener('mouseleave', function() {
     }
 });
 
-seesawArea.addEventListener('mouseenter', function() {
+seesawArea.addEventListener('mouseenter', () => {
     if (currentObj) {
         currentObj.style.display = 'flex';
     }
@@ -54,7 +56,7 @@ seesawArea.addEventListener('mouseenter', function() {
     }
 });
 
-seesawArea.addEventListener('click', function(event) {
+seesawArea.addEventListener('click', (event) => {
     if (!currentObj) return;
     
     const rect = plank.getBoundingClientRect();
@@ -100,6 +102,7 @@ function createObject(){
     obj.style.pointerEvents = 'none';
     document.body.appendChild(obj);
     currentObj = obj;
+    nextWeightDisplay.textContent = weight + ' kg';
 }
 //obj (top) ile plank arası çizgi oluşturur
 function createLine(){
@@ -208,8 +211,11 @@ function calculate(){
     const torqueDifference = rightTorque - leftTorque;
     const angle = Math.max(-MAX_ANGLE, Math.min(MAX_ANGLE, torqueDifference / 10));
     plank.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+
+    angleDisplay.textContent = angle.toFixed(1) + '°';
     saveState();
 }
+
 
 // kaydetme, yükleme ve reset methodları - küçük bir proje olduğu için yeni script dosyasında oluşturmadım
 function saveState(){
@@ -285,6 +291,7 @@ function resetSeesaw(){
     plank.style.transform = 'translateX(-50%) rotate(0deg)';
     leftWeightDisplay.textContent = '0';
     rightWeightDisplay.textContent = '0';
+    angleDisplay.textContent = '0°';
     init();
 }
 
