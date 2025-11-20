@@ -27,6 +27,7 @@ function init(){
 
 seesawArea.addEventListener('mousemove', (event) => {
     if (!currentObj) return;
+    currentObj.style.display = 'flex';
     // mouse pozisyonuna göre objeyi yerleştirir plank dışına çıkıldığında
     // çıkıldığı yöndeki plank sınırına sabitler
     const rect = plank.getBoundingClientRect();
@@ -93,7 +94,7 @@ function createObject(){
     obj.style.backgroundColor = getRandomColor();
     obj.style.borderRadius = '50%';
     obj.style.position = 'fixed';
-    obj.style.display = 'flex';
+    obj.style.display = 'none';
     obj.style.alignItems = 'center';
     obj.style.justifyContent = 'center';
     obj.style.color = 'white';
@@ -120,6 +121,7 @@ function createLine(){
     line.style.backgroundColor = 'grey';
     line.style.opacity = '0.7';
     line.style.pointerEvents = 'none';
+    line.style.display = 'none';
 }
 //çizginin konumunu anlık olarak günceller
 function updateLine(positionX){
@@ -131,8 +133,7 @@ function updateLine(positionX){
     line.style.left = positionX + 'px';
     line.style.top = objRect.bottom + 'px';
     line.style.height = height + 'px';
-    line.style.display = 'block';
-    
+    line.style.display = 'flex';
 }
 
 function getRandomColor() {
