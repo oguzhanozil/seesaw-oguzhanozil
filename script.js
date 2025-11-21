@@ -21,7 +21,7 @@ let currentObj = null;
 let line = null;
 
 function init(){
-    createObject();
+    createWeightObject();
     createLine();
 }
 
@@ -83,14 +83,14 @@ seesawArea.addEventListener('click', (event) => {
 
     const droppingObj = currentObj;
     currentObj = null;
-    createObject();
+    createWeightObject();
     createLine();
-    addObject(relativeX, weight, droppingObj, clickX, currentAngle); 
+    addWeightObject(relativeX, weight, droppingObj, clickX, currentAngle); 
 });
 
 resetButton.addEventListener('click', resetSeesaw);
 
-function createObject(){
+function createWeightObject(){
     const weight = Math.floor(Math.random() * 10) + 1;
     const obj = document.createElement('div');
     const size = 22 + (weight * 3);
@@ -143,7 +143,7 @@ function getRandomColor() {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function addObject(positionX, weight, obj, clickX, angle) {
+function addWeightObject(positionX, weight, obj, clickX, angle) {
     const rect = plank.getBoundingClientRect();
     const seesawRect = seesawArea.getBoundingClientRect();
     
@@ -174,7 +174,7 @@ function addObject(positionX, weight, obj, clickX, angle) {
             originalLeft: originalLeft
         });
         
-        calculate();
+        calculateTorque();
     });
 }
 
@@ -197,7 +197,7 @@ function dropdownAnimation(startY, obj, targetY, callback){
     }
     window.requestAnimationFrame(animate);
 }
-function calculate(){
+function calculateTorque(){
     let leftTorque = 0;
     let rightTorque = 0;
     leftWeight = 0;
@@ -275,7 +275,7 @@ function loadState(){
     
     leftWeight = state.leftWeight;
     rightWeight = state.rightWeight;    
-    calculate();
+    calculateTorque();
     init(); 
     return true; 
 }
