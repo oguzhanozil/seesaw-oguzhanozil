@@ -34,7 +34,7 @@ seesawArea.addEventListener('mousemove', (event) => {
     let center = (rect.right + rect.left)/2;
     if (rect.left < event.clientX && rect.right > event.clientX) {
     currentObj.style.left = event.clientX + 'px';
-    currentObj.style.top = '40%';
+    currentObj.style.top = '50%';
     currentObj.style.transform = 'translate(-50%, -50%)';
     updateLine(event.clientX);
     distanceIndicator.textContent = Math.round(event.clientX - center);
@@ -94,21 +94,17 @@ function createObject(){
     const weight = Math.floor(Math.random() * 10) + 1;
     const obj = document.createElement('div');
     const size = 22 + (weight * 3);
+    const color = getRandomColor();
+    
     obj.className = 'weight-object';
-    obj.style.width = size + 'px';
-    obj.style.height = size + 'px';
-    obj.style.backgroundColor = getRandomColor();
-    obj.style.borderRadius = '50%';
+    obj.style.setProperty('--size', size);
+    obj.style.setProperty('--color', color);
     obj.style.position = 'fixed';
     obj.style.display = 'none';
-    obj.style.alignItems = 'center';
-    obj.style.justifyContent = 'center';
-    obj.style.color = 'white';
-    obj.style.fontWeight = 'bold';
     obj.style.fontSize = Math.max(10, weight + 2) + 'px';
     obj.textContent = weight + 'kg';
     obj.style.cursor = 'pointer';
-    obj.style.pointerEvents = 'none';
+    
     document.body.appendChild(obj);
     currentObj = obj;
     nextWeightDisplay.textContent = weight + ' kg';
@@ -147,35 +143,41 @@ function getRandomColor() {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function addObject(positionX, weight, obj,clickX,angle) {
+function addObject(positionX, weight, obj, clickX, angle) {
     const rect = plank.getBoundingClientRect();
     const seesawRect = seesawArea.getBoundingClientRect();
+    
     obj.style.position = 'fixed';
     obj.style.left = clickX + 'px';
     obj.style.top = (seesawRect.top - 100) + 'px'; 
     obj.style.transform = 'translateX(-50%)';
-    const targetY = (rect.top - parseInt(obj.style.height) / 2)+25;
+    
+    const size = getComputedStyle(obj).getPropertyValue('--size');
+    const targetY = (rect.top - parseInt(size) / 2) + 25;
+    
     dropdownAnimation(parseFloat(obj.style.top), obj, targetY, () => {
-        // animasyon bitince planka yerleştirir
         plank.appendChild(obj);
         obj.style.position = 'absolute';
         obj.style.left = positionX + 'px';
         obj.style.top = '0px';
-        obj.style.bottom = '0%';
         obj.style.transform = 'translateX(-50%) translateY(-20%)';
+        
         const newRect = plank.getBoundingClientRect();
         const actualLeft = clickX - newRect.left;
-        obj.style.left = actualLeft/ Math.cos(angle * Math.PI / 180) + 'px';
-        //objeyi listeye kaydeder
+        const originalLeft = actualLeft / Math.cos(angle * Math.PI / 180);
+        obj.style.left = originalLeft + 'px';
+
         objects.push({
             x: positionX,
             weight: weight,
-            element: obj
+            element: obj,
+            originalLeft: originalLeft
         });
         
         calculate();
     });
 }
+
 function dropdownAnimation(startY, obj, targetY, callback){
     let positionY = startY;
     let velocity = 0;
@@ -232,8 +234,9 @@ function saveState(){
          objects: objects.map(obj => ({
             x: obj.x,
             weight: obj.weight,
-            color: obj.element.style.backgroundColor,
-            size: obj.element.style.width
+            color: getComputedStyle(obj.element).getPropertyValue('--color'),
+            size: getComputedStyle(obj.element).getPropertyValue('--size'),
+            originalLeft: obj.originalLeft
         })),
         leftWeight: leftWeight,
         rightWeight: rightWeight
@@ -244,33 +247,29 @@ function saveState(){
 function loadState(){
     const savedState = localStorage.getItem('seesawState');
     if (!savedState) return false;
+    
     const state = JSON.parse(savedState);
+    
     state.objects.forEach(objData => {
         const obj = document.createElement('div');
         obj.className = 'weight-object';
-        obj.style.width = objData.size;
-        obj.style.height = objData.size;
-        obj.style.backgroundColor = objData.color;
-        obj.style.borderRadius = '50%';
+        
+        obj.style.setProperty('--size', parseInt(objData.size));
+        obj.style.setProperty('--color', objData.color);
         obj.style.position = 'absolute';
-        obj.style.left = objData.x + 'px';
+        obj.style.left = objData.originalLeft + 'px';
         obj.style.top = '0px';
-        obj.style.display = 'flex';
-        obj.style.alignItems = 'center';
-        obj.style.justifyContent = 'center';
-        obj.style.color = 'white';
-        obj.style.fontWeight = 'bold';
         obj.style.fontSize = Math.max(10, objData.weight + 2) + 'px';
         obj.textContent = objData.weight + 'kg';
-        obj.style.transform = 'translateX(-50%) translateY(-100%)';
-        obj.style.pointerEvents = 'none';
+        obj.style.transform = 'translateX(-50%) translateY(-20%)';
         
         plank.appendChild(obj);
         
         objects.push({
             x: objData.x,
             weight: objData.weight,
-            element: obj
+            element: obj,
+            originalLeft: objData.originalLeft
         });
     });
     
