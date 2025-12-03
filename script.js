@@ -19,6 +19,8 @@ let leftWeight = 0;
 let rightWeight = 0;
 let currentObj = null;
 let line = null;
+let leftTorque = 0;
+let rightTorque = 0;
 
 function init(){
     createWeightObject();
@@ -83,15 +85,25 @@ seesawArea.addEventListener('click', (event) => {
 
     const droppingObj = currentObj;
     currentObj = null;
-    createWeightObject();
-    createLine();
+
     addWeightObject(relativeX, weight, droppingObj, clickX, currentAngle); 
 });
 
 resetButton.addEventListener('click', resetSeesaw);
 
 function createWeightObject(){
-    const weight = Math.floor(Math.random() * 10) + 1;
+    let weight;
+    if(Math.abs(rightTorque-leftTorque)>0){
+        weight = Math.round(Math.abs(rightTorque - leftTorque) / 200);
+        weight = Math.max(1, Math.min(10, weight));
+        console.log('Created weight based on torque difference:', weight , "   " , Math.abs(rightTorque-leftTorque));
+
+    }else{
+         weight = Math.floor(Math.random() * 10) + 1;
+                 console.log('Created weight based on torque difference:', weight , "   " , Math.abs(rightTorque-leftTorque));
+
+    }
+
     const obj = document.createElement('div');
     const size = 22 + (weight * 3);
     const color = getRandomColor();
@@ -175,6 +187,8 @@ function addWeightObject(positionX, weight, obj, clickX, angle) {
         });
         
         calculateTorque();
+        createWeightObject();
+        createLine();
     });
 }
 
@@ -198,11 +212,10 @@ function dropdownAnimation(startY, obj, targetY, callback){
     window.requestAnimationFrame(animate);
 }
 function calculateTorque(){
-    let leftTorque = 0;
-    let rightTorque = 0;
     leftWeight = 0;
     rightWeight = 0;
-    
+    leftTorque = 0;
+    rightTorque = 0; 
     const center = PLANK_LENGTH / 2;
     objects.forEach(obj => {
         const distance = obj.x - center;
@@ -217,13 +230,14 @@ function calculateTorque(){
         }
     });
     
-    leftWeightDisplay.textContent = leftWeight;
-    rightWeightDisplay.textContent = rightWeight;
+    leftWeightDisplay.textContent = Math.floor(leftTorque);
+    rightWeightDisplay.textContent = Math.floor(rightTorque);
     const torqueDifference = rightTorque - leftTorque;
     const angle = Math.max(-MAX_ANGLE, Math.min(MAX_ANGLE, torqueDifference / 10));
     plank.style.transform = `translateX(-50%) rotate(${angle}deg)`;
 
     angleDisplay.textContent = angle.toFixed(1) + '°';
+
     saveState();
 }
 
